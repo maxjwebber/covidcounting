@@ -59,3 +59,5 @@ close(FH);
 #calculate expected value (mean) of Y
 $EY = $totalY / $m;
 say "EY is $EY";
+my $k = 2**$EY;
+say "k is $k";
