@@ -30,10 +30,10 @@ open(FH, '<', $filename) or die $!;
 $m = 0;
 $totalY = 0;
 my $testpoolstring;
-my $linelength;
+my $n;
 while(<FH>){
-    $linelength = ((length $_) - 1);
-    $testpoolstring = substr($_, 0, $linelength);
+    $n = ((length $_) - 1);
+    $testpoolstring = substr($_, 0, $n);
     #for each line in the file, transform binary string to character list
     @testpool = split (//, $testpoolstring);
     #count the lines/number of test pools
@@ -45,7 +45,7 @@ while(<FH>){
     {
         #increase divisor by factor of 2, creating smaller and smaller subsets
         $subset_divisor*=2;
-        $subset_size = ceil($linelength / $subset_divisor);
+        $subset_size = ceil($n / $subset_divisor);
         @subset = sample $subset_size, @testpool;
         ##increase count of Y if someone in the subset is infected
         if (any {$_ == 1} @subset)
