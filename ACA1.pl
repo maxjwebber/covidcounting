@@ -79,27 +79,27 @@ sub ACA1
     #say "$trialsACA1 trials were performed.";
     #estimate expected value of Y
     my $sample_mean_Y = $totalY / $trialsACA1;
-    say "Sample Mean of Y is $sample_mean_Y. This is an unbiased estimator for EY.";
+    #say "Sample Mean of Y is $sample_mean_Y. This is an unbiased estimator for EY.";
 
     #estimate variance of Y
     my $sample_variance_Y = (1/($trialsACA1 - 1))*($totalsquaredY - ($trialsACA1*($sample_mean_Y**2)));
-    say "Sample Variance is $sample_variance_Y. This is an unbiased estimator for Var(Y).";
+    #say "Sample Variance is $sample_variance_Y. This is an unbiased estimator for Var(Y).";
 
     #estimate expected value of 2^Y
     my $sample_mean_2totheY = $total2totheY / $trialsACA1;
-    say "Sample Mean of 2^Y is $sample_mean_2totheY. This is an unbiased estimator for E(2^Y).";
+    #say "Sample Mean of 2^Y is $sample_mean_2totheY. This is an unbiased estimator for E(2^Y).";
 
     #estimate variance of 2^Y
     my $sample_variance_2totheY = (1/($trialsACA1 - 1))*($total2tothe2Y - ($trialsACA1*($sample_mean_2totheY**2)));
-    say "Sample Variance is $sample_variance_2totheY. This is an unbiased estimator for Var(2^Y).";
+    #say "Sample Variance is $sample_variance_2totheY. This is an unbiased estimator for Var(2^Y).";
 
     #estimate expected value of 4^Y
     my $sample_mean_4totheY = $total4totheY / $trialsACA1;
-    say "Sample Mean of 4^Y is $sample_mean_4totheY. This is an unbiased estimator for E(4^Y).";
+    #say "Sample Mean of 4^Y is $sample_mean_4totheY. This is an unbiased estimator for E(4^Y).";
 
     #estimate variance of 4^Y
     my $sample_variance_4totheY = (1/($trialsACA1 - 1))*($total4tothe2Y - ($trialsACA1*($sample_mean_4totheY**2)));
-    say "Sample Variance is $sample_variance_4totheY. This is an unbiased estimator for Var(4^Y).";
+    #say "Sample Variance is $sample_variance_4totheY. This is an unbiased estimator for Var(4^Y).";
 
     return ($sample_mean_Y,$sample_variance_Y,$sample_mean_2totheY,$sample_variance_2totheY,$sample_mean_4totheY,$sample_variance_4totheY);
 }
