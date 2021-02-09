@@ -38,8 +38,11 @@ sub ACA1
     #this program will perform one trial of the ACA1 algorithm for each line of test data
     $trialsACA1 = 0;
     $totalY = 0;
+    $totalsquaredY = 0;
     $total2totheY = 0;
+    $total2tothe2Y = 0;
     $total4totheY = 0;
+    $total4tothe2Y = 0;
 
     my $testpoolstring;
     my $n;
