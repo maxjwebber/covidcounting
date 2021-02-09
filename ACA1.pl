@@ -103,3 +103,4 @@ sub ACA1
 
     return ($sample_mean_Y,$sample_variance_Y,$sample_mean_2totheY,$sample_variance_2totheY,$sample_mean_4totheY,$sample_variance_4totheY);
 }
+1;

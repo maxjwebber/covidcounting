@@ -7,7 +7,7 @@ use List::Util qw(shuffle);
 
 #subroutine params: how many infected, size of the pool, how many lines of test data
 
-sub generateTestData()
+sub generateTestData
 {
     my $num_infected = $_[0];
     my $num_testpool = $_[1];
@@ -35,3 +35,4 @@ sub generateTestData()
     }
     close(FH);
 }
+1;
