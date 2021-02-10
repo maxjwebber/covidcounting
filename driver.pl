@@ -7,11 +7,11 @@ use Text::CSV qw(csv);
 use Benchmark;
 my $t0 = Benchmark->new;
 
-
-my @k = (1..205);
-my $n = 1023;
+my @k = (1..2);
+my $n = 1048575;
+my $trialsPerK = 10000;
 my @ACA1results;
-my @headers = ("k","Sample Mean (Y)","Sample Variance (Y)","Sample Mean (2^Y)","Sample Variance (2^Y)","Sample Mean (4^Y)","Sample Variance (4^Y)");
+my @headers = ("k","Sample Mean (Y)","Sample Variance (Y)","Sample Mean (2^Y)","Sample Variance (2^Y)");
 my $thisk;
 my $csv = Text::CSV->new ();
 open my $fh, ">:encoding(utf8)", "results.csv" or die "results.csv: $!";
@@ -20,7 +20,7 @@ $csv->say ($fh,\@headers);
 for (@k)
 {
     $thisk = $_;
-    generateTestData($thisk,$n,10000);
+    generateTestData($thisk,$n,$trialsPerK);
     @ACA1results = ACA1();
     unshift(@ACA1results,$thisk);
     #say("@ACA1results");

@@ -14,8 +14,6 @@ sub ACA1
     my $totalsquaredY;
     my $total2totheY;
     my $total2tothe2Y;
-    my $total4totheY;
-    my $total4tothe2Y;
 
     my @subset;
     my $subset_size;
@@ -41,8 +39,6 @@ sub ACA1
     $totalsquaredY = 0;
     $total2totheY = 0;
     $total2tothe2Y = 0;
-    $total4totheY = 0;
-    $total4tothe2Y = 0;
 
     my $testpoolstring;
     my $n;
@@ -74,8 +70,6 @@ sub ACA1
         $totalsquaredY += ($Y**2);
         $total2totheY += (2**$Y);
         $total2tothe2Y += (2**(2*$Y));
-        $total4totheY += (4**$Y);
-        $total4tothe2Y += (4**(2*$Y));
     }
     close(FH);
 
@@ -96,14 +90,6 @@ sub ACA1
     my $sample_variance_2totheY = (1/($trialsACA1 - 1))*($total2tothe2Y - ($trialsACA1*($sample_mean_2totheY**2)));
     #say "Sample Variance is $sample_variance_2totheY. This is an unbiased estimator for Var(2^Y).";
 
-    #estimate expected value of 4^Y
-    my $sample_mean_4totheY = $total4totheY / $trialsACA1;
-    #say "Sample Mean of 4^Y is $sample_mean_4totheY. This is an unbiased estimator for E(4^Y).";
-
-    #estimate variance of 4^Y
-    my $sample_variance_4totheY = (1/($trialsACA1 - 1))*($total4tothe2Y - ($trialsACA1*($sample_mean_4totheY**2)));
-    #say "Sample Variance is $sample_variance_4totheY. This is an unbiased estimator for Var(4^Y).";
-
-    return ($sample_mean_Y,$sample_variance_Y,$sample_mean_2totheY,$sample_variance_2totheY,$sample_mean_4totheY,$sample_variance_4totheY);
+    return ($sample_mean_Y,$sample_variance_Y,$sample_mean_2totheY,$sample_variance_2totheY);
 }
 1;
