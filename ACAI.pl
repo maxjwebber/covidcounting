@@ -6,7 +6,7 @@ use List::Util qw(sample);
 use List::Util qw(any);
 use Statistics::Descriptive;
 
-sub ACA1
+sub ACAI
 {
     #0 is not infected, 1 is infected
     my @testpool;
@@ -17,7 +17,7 @@ sub ACA1
     my @subset;
     my $subset_size;
     my $subset_divisor;
-    my $trialsACA1;
+    #my $trialsACAI; no longer need to count trials since module handles mean/variance
     my $filename = "testdata.txt";
 
     #GOALS FOR THIS ITERATION:
@@ -34,7 +34,7 @@ sub ACA1
     open(FH, '<', $filename) or die $!;
 
     #this program will perform one trial of the ACA1 algorithm for each line of test data
-    $trialsACA1 = 0;
+    $trialsACAI = 0;
     my $stat = Statistics::Descriptive::Sparse->new();
     my $testpoolstring;
     my $n;
@@ -44,7 +44,7 @@ sub ACA1
         #for each line in the file, transform binary string to character list
         @testpool = split (//, $testpoolstring);
         #count the lines/number of trials
-        $trialsACA1++;
+        #$trialsACAI++;
         #init subset_divisor and Y
         $subset_divisor = 1;
         $Y = 0;

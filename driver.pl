@@ -8,9 +8,9 @@ use Benchmark;
 my $t0 = Benchmark->new;
 
 my @k = (1..205);
-my $n = 4095;
-my $trialsPerK = 10000;
-my @ACA1results;
+my $n = 1023;
+my $trialsPerK = 1000;
+my @ACAIresults;
 my @headers = ("k","Sample Mean (Y)","Sample Variance (Y)","Sample Mean (2^Y)","Sample Variance (2^Y)");
 my $thisk;
 my $csv = Text::CSV->new ();
@@ -21,10 +21,10 @@ for (@k)
 {
     $thisk = $_;
     generateTestData($thisk,$n,$trialsPerK);
-    @ACA1results = ACA1();
-    unshift(@ACA1results,$thisk);
-    #say("@ACA1results");
-    $csv->say ($fh,\@ACA1results);
+    @ACAIresults = ACAI();
+    unshift(@ACAIresults,$thisk);
+    #say("@ACAIresults");
+    $csv->say ($fh,\@ACAIresults);
 }
 close($fh);
 
