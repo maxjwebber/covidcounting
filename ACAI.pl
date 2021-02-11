@@ -4,16 +4,15 @@ use warnings FATAL => 'all';
 use POSIX;
 use List::Util qw(sample);
 use List::Util qw(any);
+use Statistics::Descriptive;
 
 sub ACA1
 {
     #0 is not infected, 1 is infected
     my @testpool;
     my $Y;
-    my $totalY;
-    my $totalsquaredY;
-    my $total2totheY;
-    my $total2tothe2Y;
+    my @valuesY;
+    my @values2totheY;
 
     my @subset;
     my $subset_size;
@@ -22,8 +21,9 @@ sub ACA1
     my $filename = "testdata.txt";
 
     #GOALS FOR THIS ITERATION:
-    #estimate EY using the sample mean.
-    #estimate Var(Y) using the sample variance.
+    #estimate EY and E(2^Y) using the sample mean.
+    #estimate Var(Y) and Var(2^Y) using the sample variance.
+    #improve accuracy over 2-9-2021 build using Statistics::Descriptive instead of estimate formulae
 
     #ACA1 is:
     #Number the samples randomly 1 through n.
@@ -35,11 +35,7 @@ sub ACA1
 
     #this program will perform one trial of the ACA1 algorithm for each line of test data
     $trialsACA1 = 0;
-    $totalY = 0;
-    $totalsquaredY = 0;
-    $total2totheY = 0;
-    $total2tothe2Y = 0;
-
+    my $stat = Statistics::Descriptive::Sparse->new();
     my $testpoolstring;
     my $n;
     while(<FH>){
@@ -66,28 +62,32 @@ sub ACA1
                 $Y++;
             }
         }while ($subset_size > 1);
-        $totalY += $Y;
-        $totalsquaredY += ($Y**2);
-        $total2totheY += (2**$Y);
-        $total2tothe2Y += (2**(2*$Y));
+        push(@valuesY,$Y);
+        push(@values2totheY,(2**$Y));
     }
     close(FH);
 
     #say "$trialsACA1 trials were performed.";
+
+    $stat->add_data(@valuesY);
+
     #estimate expected value of Y
-    my $sample_mean_Y = $totalY / $trialsACA1;
+    my $sample_mean_Y = $stat->mean();
     #say "Sample Mean of Y is $sample_mean_Y. This is an unbiased estimator for EY.";
 
     #estimate variance of Y
-    my $sample_variance_Y = (1/($trialsACA1 - 1))*($totalsquaredY - ($trialsACA1*($sample_mean_Y**2)));
+    my $sample_variance_Y = $stat->variance();
     #say "Sample Variance is $sample_variance_Y. This is an unbiased estimator for Var(Y).";
 
+    $stat->clear();
+    $stat->add_data(@values2totheY);
+
     #estimate expected value of 2^Y
-    my $sample_mean_2totheY = $total2totheY / $trialsACA1;
+    my $sample_mean_2totheY = $stat->mean();
     #say "Sample Mean of 2^Y is $sample_mean_2totheY. This is an unbiased estimator for E(2^Y).";
 
     #estimate variance of 2^Y
-    my $sample_variance_2totheY = (1/($trialsACA1 - 1))*($total2tothe2Y - ($trialsACA1*($sample_mean_2totheY**2)));
+    my $sample_variance_2totheY = $stat->variance();
     #say "Sample Variance is $sample_variance_2totheY. This is an unbiased estimator for Var(2^Y).";
 
     return ($sample_mean_Y,$sample_variance_Y,$sample_mean_2totheY,$sample_variance_2totheY);

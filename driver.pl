@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 use 5.32.1;
 use warnings FATAL => 'all';
-require "ACA1.pl";
+require "ACAI.pl";
 require "generateTestData.pl";
 use Text::CSV qw(csv);
 use Benchmark;
 my $t0 = Benchmark->new;
 
 my @k = (1..205);
-my $n = 1023;
+my $n = 4095;
 my $trialsPerK = 10000;
 my @ACA1results;
 my @headers = ("k","Sample Mean (Y)","Sample Variance (Y)","Sample Mean (2^Y)","Sample Variance (2^Y)");
