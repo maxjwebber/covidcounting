@@ -2,6 +2,7 @@
 use 5.32.1;
 use warnings FATAL => 'all';
 require "ACAI.pl";
+require "ACAP.pl";
 require "generateTestData.pl";
 use Text::CSV qw(csv);
 use Benchmark;
@@ -9,8 +10,8 @@ my $t0 = Benchmark->new;
 
 my @k = (1..205);
 my $n = 1023;
-my $trialsPerK = 1000;
-my @ACAIresults;
+my $trialsPerK = 10000;
+my @ACAresults;
 my @headers = ("k","Sample Mean (Y)","Sample Variance (Y)","Sample Mean (2^Y)","Sample Variance (2^Y)");
 my $thisk;
 my $csv = Text::CSV->new ();
@@ -21,10 +22,10 @@ for (@k)
 {
     $thisk = $_;
     generateTestData($thisk,$n,$trialsPerK);
-    @ACAIresults = ACAI();
-    unshift(@ACAIresults,$thisk);
-    #say("@ACAIresults");
-    $csv->say ($fh,\@ACAIresults);
+    @ACAresults = ACAI();
+    unshift(@ACAresults,$thisk);
+    #say("@ACAresults");
+    $csv->say ($fh,\@ACAresults);
 }
 close($fh);
 

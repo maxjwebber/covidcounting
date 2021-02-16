@@ -2,11 +2,9 @@
 use 5.32.1;
 use warnings FATAL => 'all';
 use POSIX;
-use List::Util qw(sample);
-use List::Util qw(any);
 use Statistics::Descriptive;
 
-sub ACAI
+sub ACAP
 {
     #0 is not infected, 1 is infected
     my @testdata;
@@ -14,60 +12,63 @@ sub ACAI
     my @valuesY;
     my @values2totheY;
 
-    my @testpool;
     my $subset_size;
     my $subset_divisor;
-    #my $trialsACAI; no longer need to count trials since module handles mean/variance
     my $filename = "testdata.txt";
 
     #GOALS FOR THIS ITERATION:
+    #implement partition variant of ACA1
     #estimate EY and E(2^Y) using the sample mean.
     #estimate Var(Y) and Var(2^Y) using the sample variance.
-    #improve accuracy over 2-9-2021 build using Statistics::Descriptive instead of estimate formulae
+    #compare speed and accuracy to that of ACAI
 
-    #ACA1 is:
+    #ACAP is:
     #Number the samples randomly 1 through n.
     #(the order of the samples is already randomized when creating test data so we can arbitrarily number them by order of their indices)
-    #Choose independently subsets of size ⎾n/2⏋, ⎾n/4⏋, ⎾n/8⏋, ⎾n/16⏋, …, 1.
+    #Partition the people into subsets of size ⌈n/2⌉, ⌈n/4⌉, ⌈n/8⌉, ⌈n/16⌉, ….
     #Let Y = the number of subsets that test positive. Then EY ≈ log(k) where k is the number of infected individuals.
 
     open(FH, '<', $filename) or die $!;
 
     #this program will perform one trial of the ACA1 algorithm for each line of test data
-    #$trialsACAI = 0;
     my $stat = Statistics::Descriptive::Sparse->new();
-    my $testpoolstring;
+    my $testdatastring;
     my $n;
+    my $firstindex;
+    my $lastindex;
     while(<FH>){
         $n = ((length $_) - 1);
-        $testpoolstring = substr($_, 0, $n);
+        $testdatastring = substr($_, 0, $n);
         #for each line in the file, transform binary string to character list
-        @testdata = split (//, $testpoolstring);
+        @testdata = split (//, $testdatastring);
         #count the lines/number of trials
         #$trialsACAI++;
         #init subset_divisor and Y
         $subset_divisor = 1;
         $Y = 0;
-        do
+        $firstindex = 0;
+        while ($firstindex < $n)
         {
             #increase divisor by factor of 2, creating smaller and smaller subsets
             $subset_divisor*=2;
-            #Choose independently subsets of size ⎾n/2⏋, ⎾n/4⏋, ⎾n/8⏋, ⎾n/16⏋, …, 1.
             $subset_size = ceil($n / $subset_divisor);
-            @testpool = sample $subset_size, @testdata;
+            $lastindex = $firstindex + $subset_size - 1;
             #Let Y = the number of subsets that test positive.
             #increase count of Y if someone in the selected subset is infected
-            if (any {$_ == 1} @testpool)
+            for ($firstindex..$lastindex)
             {
-                $Y++;
+                if ($testdata[$_] == 1)
+                {
+                    $Y++;
+                    last; #exit for loop
+                }
             }
-        }while ($subset_size > 1);
+            $firstindex = $lastindex + 1;
+        };
         push(@valuesY,$Y);
         push(@values2totheY,(2**$Y));
     }
     close(FH);
-
-    #say "$trialsACA1 trials were performed.";
 
     $stat->add_data(@valuesY);
 
