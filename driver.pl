@@ -75,7 +75,7 @@ else
     $linI = $linI."+ ".$thetaI->[0];
 }
 
-$csv->say ($fhR,[$n,$k[0],$ARGV[2],$trialsPerK,$linP,$regP->rsq(),$linI,$regI->rsq()]);
+$csv->say ($fhR,[$n,$ARGV[1],$ARGV[2],$trialsPerK,$linP,$regP->rsq(),$linI,$regI->rsq()]);
 close($fhR);
 print('done.');
 1;
