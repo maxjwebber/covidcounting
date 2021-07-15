@@ -38,30 +38,16 @@ my $regI = Statistics::Regression->new("ACAI",["Intercept", "Slope"]);
 for (@k)
 {
     $thisk = $_;
-    if ($thisk == 0)
-    {
-        #this is a workaround for a flaw in Perl's file reading.
-        #a test data file with all zeros reads as empty, so the algorithms won't work.
-        #yet, we know none of the groups will test positive.
-        #therefore we can use the following data for k = 0 regardless of the values for n or trialsperk.
-        my @zerokdata = [0,0,0,0,0];
-        $regP->include($thisk, [1.0, 0]);
-        $regI->include($thisk, [1.0, 0]);
-        $csv->say ($fhP,\@zerokdata);
-        $csv->say ($fhI,\@zerokdata);
-    }
-    else
-    {
-        generateTestData($thisk,$n,$trialsPerK);
-        @ACAPresults = ACAP();
-        @ACAIresults = ACAI();
-        unshift(@ACAPresults,$thisk);
-        unshift(@ACAIresults,$thisk);
-        $regP->include($thisk, [1.0, $ACAPresults[3]]);
-        $regI->include($thisk, [1.0, $ACAIresults[3]]);
-        $csv->say ($fhP,\@ACAPresults);
-        $csv->say ($fhI,\@ACAIresults);
-    }
+    generateTestData($thisk,$n,$trialsPerK);
+    @ACAPresults = ACAP();
+    @ACAIresults = ACAI();
+    unshift(@ACAPresults,$thisk);
+    unshift(@ACAIresults,$thisk);
+    $regP->include($thisk, [1.0, $ACAPresults[3]]);
+    $regI->include($thisk, [1.0, $ACAIresults[3]]);
+    $csv->say ($fhP,\@ACAPresults);
+    $csv->say ($fhI,\@ACAIresults);
+
 }
 close($fhP);
 close($fhI);
