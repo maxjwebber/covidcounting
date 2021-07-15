@@ -44,7 +44,6 @@ sub ACAI
         #for each line in the file, transform binary string to character list
         @testdata = split (//, $testpoolstring);
         #count the lines/number of trials
-        #$trialsACAI++;
         #init subset_divisor and Y
         $subset_divisor = 1;
         $Y = 0;
@@ -92,4 +91,5 @@ sub ACAI
 
     return ($sample_mean_Y,$sample_variance_Y,$sample_mean_2totheY,$sample_variance_2totheY);
 }
+
 1;
