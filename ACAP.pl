@@ -47,7 +47,7 @@ sub ACAP
         {
             #increase divisor by factor of 2, creating smaller and smaller subsets
             $subset_size = ceil($subset_size / 2);
-            $lastindex = $firstindex + $subset_size - 1;
+            $lastindex = ($firstindex + $subset_size - 1 < $n) ? $firstindex + $subset_size - 1 : $n-1;
             #Let Y = the number of subsets that test positive.
             #increase count of Y if someone in the selected subset is infected
             for my $i ($firstindex..$lastindex)
