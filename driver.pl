@@ -4,21 +4,59 @@ use warnings FATAL => 'all';
 require "ACAI.pl";
 require "ACAP.pl";
 require "generateTestData.pl";
+require "mystats.pl";
 use Text::CSV qw(csv);
-use Statistics::Regression;
 
-if ($#ARGV != 4)
+if ($#ARGV<2)
 {
-    die 'must supply all params. driver.pl [number of subjects] [lowest k] [highest k] [trials per each k]';
+    die "usage: driver.pl -n [value] (required) -kmin [value] (optional) -kmax [value] (optional) -trialsperk [value] (optional)";
 }
 
-my $n = $ARGV[0];
-if ($ARGV[1]!=0)
+my $n = -1;
+my $mink = 0;
+my $maxk = -1;
+my $trialsPerK = 10000;
+
+for(my $i = 0; $i <= $#ARGV; $i++)
 {
-    say "use of lowest # infected greater than 0 is not advised; may skew linear regression."
+    if ($ARGV[$i] eq '-n')
+    {
+        $i++;
+        $n = $ARGV[$i];
+    }
+    elsif ($ARGV[$i] eq '-kmin')
+    {
+        $i++;
+        $mink = $ARGV[$i];
+    }
+    elsif ($ARGV[$i] eq '-kmax')
+    {
+        $i++;
+        $maxk = $ARGV[$i];
+    }
+    elsif ($ARGV[$i] eq '-trialsperk')
+    {
+        $i++;
+        $trialsPerK = $ARGV[$i];
+    }
+
 }
-my @k = ($ARGV[1]..$ARGV[2]);
-my $trialsPerK = $ARGV[3];
+
+if ($n<1)
+{
+    die "provide a value for -n [number of subjects]";
+}
+
+if ($maxk<-1)
+{
+    $maxk = 0.05 * $n;
+}
+
+if ($mink>1)
+{
+    say "use of lowest # infected greater than 1 is not advised; may skew linear regression."
+}
+
 my @ACAIresults;
 my @ACAPresults;
 my @headers = ("k","Sample Mean (Y)","Sample Variance (Y)","Sample Mean (2^Y)","Sample Variance (2^Y)");
@@ -29,13 +67,10 @@ open my $fhI, ">:encoding(utf8)", "ACAI_results.csv" or die "ACAI_results.csv: $
 $csv->bind_columns (\(@headers));
 $csv->say ($fhP,\@headers);
 $csv->say ($fhI,\@headers);
-my $regP = Statistics::Regression->new("ACAP",["Intercept", "Slope"]);
-my $regI = Statistics::Regression->new("ACAI",["Intercept", "Slope"]);
+my @xP;
+my @xI;
 
-#this is a workaround for a flaw in Perl's file reading.
-
-
-for (@k)
+for ($mink..$maxk)
 {
     $thisk = $_;
     generateTestData($thisk,$n,$trialsPerK);
@@ -43,39 +78,62 @@ for (@k)
     @ACAIresults = ACAI();
     unshift(@ACAPresults,$thisk);
     unshift(@ACAIresults,$thisk);
-    $regP->include($thisk, [1.0, $ACAPresults[3]]);
-    $regI->include($thisk, [1.0, $ACAIresults[3]]);
+    push (@xP,$ACAPresults[3]);
+    push (@xI,$ACAIresults[3]);
     $csv->say ($fhP,\@ACAPresults);
     $csv->say ($fhI,\@ACAIresults);
-
 }
 close($fhP);
 close($fhI);
+
+
 say("all trials for all k values complete. calculating linear regressions for ACAP and ACAI...");
 open my $fhR, ">:encoding(utf8)", "linear_regression.csv" or die "linear_regression.csv: $!";
 $csv->say ($fhR,['n','lowest k','highest k','trials per k','Regression (ACAP)','R^2 (ACAP)','Regression (ACAI)','R^2 (ACAI)']);
-my $thetaP = $regP->theta();
-my $linP = "y = ".$thetaP->[1]."x ";
-if ($thetaP->[0] < 0)
+my @k = ($mink..$maxk);
+my $meank = ($mink+$maxk)/2;
+my $vark = variance(@k);
+
+my $meanxP = mean(@xP);
+my $varxP = variance(@xP);
+
+my $covarxyP = covariance(\@xP,\@k);
+my $slopeP = $covarxyP / $varxP;
+my $interceptP = $meank - ($slopeP * $meanxP);
+
+my $RsqP = ($covarxyP**2 / ($varxP * $vark));
+
+my $linP = "y = ".$slopeP."x ";
+if ($interceptP < 0)
 {
-    $linP = $linP." ".$thetaP->[0];
+    $linP = $linP.$interceptP;
 }
 else
 {
-    $linP = $linP."+ ".$thetaP->[0];
-}
-my $thetaI = $regI->theta();
-my $linI = "y = ".$thetaI->[1]."x ";
-if ($thetaI->[0] < 0)
-{
-    $linI = $linI." ".$thetaI->[0];
-}
-else
-{
-    $linI = $linI."+ ".$thetaI->[0];
+    $linP = $linP."+".$interceptP;
 }
 
-$csv->say ($fhR,[$n,$ARGV[1],$ARGV[2],$trialsPerK,$linP,$regP->rsq(),$linI,$regI->rsq()]);
+
+my $meanxI = mean(@xI);
+my $varxI = variance(@xI);
+my $covarxyI = covariance(\@xI,\@k);
+my $slopeI = $covarxyI / $varxI;
+my $interceptI = $meank - ($slopeI * $meanxI);
+
+my $RsqI = ($covarxyI**2 / ($varxI * $vark));
+
+my $linI = "y = ".$slopeI."x ";
+
+if ($interceptI < 0)
+{
+    $linI = $linI.$interceptI;
+}
+else
+{
+    $linI = $linI."+".$interceptI;
+}
+
+$csv->say ($fhR,[$n,$mink,$maxk,$trialsPerK,$linP,$RsqP,$linI,$RsqI]);
 close($fhR);
 print('done.');
 1;
