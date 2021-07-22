@@ -47,10 +47,11 @@ if ($n<1)
     die "provide a value for -n [number of subjects]";
 }
 
-if ($maxk<-1)
+if ($maxk<0)
 {
-    $maxk = 0.05 * $n;
+    $maxk = ceil(0.05 * $n);
 }
+
 
 if ($mink>1)
 {
