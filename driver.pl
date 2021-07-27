@@ -71,11 +71,22 @@ $csv->say ($fhI,\@headers);
 my @xP;
 my @xI;
 
+my @subsetSizesACAP;
+my $progress = ceil($n/2);
+push (@subsetSizesACAP,$progress);
+my $divisor = 2;
+while ($progress < $n) {
+    my $next = ceil(floor($n/$divisor)/2);
+    push (@subsetSizesACAP,$next);
+    $progress += $next;
+    $divisor *= 2;
+}
+
 for ($mink..$maxk)
 {
     $thisk = $_;
     generateTestData($thisk,$n,$trialsPerK);
-    @ACAPresults = ACAP();
+    @ACAPresults = ACAP(@subsetSizesACAP);
     @ACAIresults = ACAI();
     unshift(@ACAPresults,$thisk);
     unshift(@ACAIresults,$thisk);

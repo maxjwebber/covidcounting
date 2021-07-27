@@ -6,6 +6,7 @@ use Statistics::Descriptive;
 use feature 'unicode_strings';
 sub ACAP
 {
+    #expects array of subset sizes as a variable (generated in driver)
     #0 is not infected, 1 is infected
     my @testdata;
     my $Y;
@@ -26,33 +27,30 @@ sub ACAP
     #(the order of the samples is already randomized when creating test data so we can arbitrarily number them by order of their indices)
     #Partition the people into subsets of size ⌈n/2⌉, ⌈n/4⌉, ⌈n/8⌉, ⌈n/16⌉, ….
     #Let Y = the number of subsets that test positive. Then EY ≈ log(k) where k is the number of infected individuals.
-
+    my @sizes = @_;
     open(FH, "<", $filename) or die $!;
 
     #this program will perform one trial of the ACA1 algorithm for each line of test data
     my $stat = Statistics::Descriptive::Sparse->new();
     my $testdatastring;
-    my $n;
     my $firstindex;
     my $lastindex;
+
     while(<FH>){
-        $n = ((length $_) - 1);
         $testdatastring = substr($_, 0, $n);
         #for each line in the file, transform binary string to character list
         @testdata = split (//, $testdatastring);
         $Y = 0;
         $firstindex = 0;
-        $subset_size = $n;
-        while ($firstindex < $n)
+
+        for my $i ($#sizes)
         {
-            #increase divisor by factor of 2, creating smaller and smaller subsets
-            $subset_size = ceil($subset_size / 2);
-            $lastindex = ($firstindex + $subset_size - 1 < $n) ? $firstindex + $subset_size - 1 : $n-1;
+            $lastindex = $firstindex + $sizes[$i] - 1;
             #Let Y = the number of subsets that test positive.
             #increase count of Y if someone in the selected subset is infected
-            for my $i ($firstindex..$lastindex)
+            for my $j ($firstindex..$lastindex)
             {
-                if($testdata[$i] == 1)
+                if($testdata[$j] == 1)
                 {
                     $Y++;
                     last; #exit for loop
